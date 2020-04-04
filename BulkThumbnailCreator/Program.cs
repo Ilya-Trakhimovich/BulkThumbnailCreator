@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Configuration;
-
+using System.Drawing;
 
 namespace BulkThumbnailCreator
 {
@@ -9,16 +9,25 @@ namespace BulkThumbnailCreator
         static void Main(string[] args)
         {
             var pathtoDirectory = ConfigurationManager.AppSettings["Path"];
-            var pathToNewFolder = ConfigurationManager.AppSettings["NewPAth"];
-            ImageManipulation manipulator = new ImageManipulation(pathtoDirectory);
-            Thread threadChangeImageSize = new Thread(manipulator.ChangeImageSize);
-            Thread threadSaveImages = new Thread(manipulator.SaveChangedImages);
-            threadSaveImages.Priority = ThreadPriority.Lowest;
-            string[] images = manipulator.GetImages("*.jpg");
+            var pathToNewFolder = ConfigurationManager.AppSettings["NewPath"];
 
+            ImageManipulation manipulator = new ImageManipulation(pathtoDirectory);
+            string[] images = manipulator.GetImages("*.jpg");
             manipulator.SetBitmapObjects(images);
-            threadChangeImageSize.Start(new ImageSize(800,600));
-            threadSaveImages.Start(pathToNewFolder);
+            Bitmap[] bitmaps = manipulator.GetBitmapArray();
+
+            for (var i = 0; i < bitmaps.Length; i++)
+            {
+                Thread thread = new Thread(manipulator.RenameResizeResaveImage);
+                thread.Start(bitmaps[i]);
+            }
+
+            //Thread threadChangeImageSize = new Thread(manipulator.ChangeImageSize);
+            //Thread threadSaveImages = new Thread(manipulator.SaveChangedImage);
+            //threadSaveImages.Priority = ThreadPriority.Lowest;       
+            //manipulator.SetBitmapObjects(images);
+            //threadChangeImageSize.Start(new ImageSize(800,600));
+            //threadSaveImages.Start(pathToNewFolder);
         }
     }
 }

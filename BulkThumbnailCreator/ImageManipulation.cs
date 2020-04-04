@@ -8,10 +8,11 @@ namespace BulkThumbnailCreator
 {
     public class ImageManipulation
     {
-        Bitmap[] bitmapArray;
-        readonly object locker = new object();
+        private Bitmap[] _bitmapArray;
+        private int _count = 0;
+        //readonly object locker = new object();
         string Path { get; set; }
- 
+
         public ImageManipulation(string path)
         {
             Path = path;
@@ -22,7 +23,7 @@ namespace BulkThumbnailCreator
             string[] images = Directory.GetFiles(Path, imageFormat);
             Console.WriteLine("Images from director:");
 
-            foreach(var image in images)
+            foreach (var image in images)
             {
                 Console.WriteLine(image.ToString());
             }
@@ -34,11 +35,11 @@ namespace BulkThumbnailCreator
         {
             if (images != null)
             {
-                bitmapArray = new Bitmap[images.Length];
+                _bitmapArray = new Bitmap[images.Length];
 
-                for (var i = 0; i < bitmapArray.Length; i++)
+                for (var i = 0; i < _bitmapArray.Length; i++)
                 {
-                    bitmapArray[i] = new Bitmap(images[i]);
+                    _bitmapArray[i] = new Bitmap(images[i]);
                 }
             }
             else
@@ -49,35 +50,33 @@ namespace BulkThumbnailCreator
             Console.WriteLine("\nBitmap object done.\n");
         }
 
-        public void ChangeImageSize(object size)
+        public Bitmap[] GetBitmapArray()
         {
-            lock (locker)
+            return _bitmapArray;
+        }
+
+
+        public void RenameResizeResaveImage(object obj)
+        {
+            if (obj is Bitmap)
             {
-                if (size is ImageSize)
-                {
-                    for (var i = 0; i < bitmapArray.Length; i++)
-                    {
-                        bitmapArray[i].SetResolution(((ImageSize)size).Weight, ((ImageSize)size).Height);
-                    }
-                }
-                Console.WriteLine("Changes are done.\n");
+                ChangeImageSize((Bitmap)obj);
+                SaveChangedImage((Bitmap)obj);
             }
         }
 
-        public void SaveChangedImages(object pathToSave)
+        private void ChangeImageSize(Bitmap bitmap)
         {
-            lock (locker)
-            {
-                if (pathToSave is string)
-                {
-                    for (var i = 0; i < bitmapArray.Length; i++)
-                    {
-                        bitmapArray[i].Save($"{(string)pathToSave}\\{i}.jpg");
-                    }
-                }
 
-                Console.WriteLine("Saves are done.\n");
-            }
+            bitmap.SetResolution(800, 600);
+            Console.WriteLine("Changes are done.");
+        }
+
+        private void SaveChangedImage(Bitmap bitmap)
+        {
+
+            bitmap.Save($@"E:\NewResizePhoto\{_count++}.jpg");
+            Console.WriteLine("Save is done.\n");
         }
     }
 }

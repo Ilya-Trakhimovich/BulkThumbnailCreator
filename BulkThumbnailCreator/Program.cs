@@ -1,7 +1,5 @@
-﻿using System;
-using System.Drawing;
-using System.IO;
-using System.Threading;
+﻿using System.Threading;
+using System.Configuration;
 
 
 namespace BulkThumbnailCreator
@@ -10,7 +8,9 @@ namespace BulkThumbnailCreator
     {
         static void Main(string[] args)
         {
-            ImageManipulation manipulator = new ImageManipulation(@"E:\Photo");
+            var pathtoDirectory = ConfigurationManager.AppSettings["Path"];
+            var pathToNewFolder = ConfigurationManager.AppSettings["NewPAth"];
+            ImageManipulation manipulator = new ImageManipulation(pathtoDirectory);
             Thread threadChangeImageSize = new Thread(manipulator.ChangeImageSize);
             Thread threadSaveImages = new Thread(manipulator.SaveChangedImages);
             threadSaveImages.Priority = ThreadPriority.Lowest;
@@ -18,7 +18,7 @@ namespace BulkThumbnailCreator
 
             manipulator.SetBitmapObjects(images);
             threadChangeImageSize.Start(new ImageSize(800,600));
-            threadSaveImages.Start(@"E:\NewResizePhoto");
+            threadSaveImages.Start(pathToNewFolder);
         }
     }
 }

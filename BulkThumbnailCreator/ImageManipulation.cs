@@ -10,7 +10,7 @@ namespace BulkThumbnailCreator
     {
         private Bitmap[] _bitmapArray;
         private int _count = 0;
-        //readonly object locker = new object();
+
         string Path { get; set; }
 
         public ImageManipulation(string path)
@@ -21,7 +21,7 @@ namespace BulkThumbnailCreator
         public string[] GetImages(string imageFormat)
         {
             string[] images = Directory.GetFiles(Path, imageFormat);
-            Console.WriteLine("Images from director:");
+            Console.WriteLine("Images from directory:");
 
             foreach (var image in images)
             {
@@ -55,7 +55,6 @@ namespace BulkThumbnailCreator
             return _bitmapArray;
         }
 
-
         public void RenameResizeResaveImage(object obj)
         {
             if (obj is Bitmap)
@@ -67,7 +66,6 @@ namespace BulkThumbnailCreator
 
         private void ChangeImageSize(Bitmap bitmap)
         {
-
             bitmap.SetResolution(800, 600);
             Console.WriteLine("Changes are done.");
         }
